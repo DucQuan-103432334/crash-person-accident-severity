@@ -9,7 +9,6 @@ model_data <- merged_data %>%
       SEATING_POSITION,    # replaced by IS_DRIVER
       HELMET_BELT_WORN,    # replaced by SAFETY_USED_FLAG
       ACCIDENT_NO, VEHICLE_ID,  # IDs not useful for modeling
-      SEVERITY
     )
   ) 
 

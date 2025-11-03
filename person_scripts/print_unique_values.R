@@ -1,16 +1,20 @@
-cat("\n=== UNIQUE VALUES PER VARIABLE (compact view) ===\n\n")
+cat("\n=== UNIQUE VALUES AND COUNTS PER VARIABLE ===\n\n")
 
-for (colname in names(person_vehicle_accident)) {
-  vals <- unique(person_vehicle_accident[[colname]])
-  n_unique <- length(vals)
+data.set = model_data
+
+for (colname in names(data.set)) {
+  cat("\n•", colname, "→", length(unique(data.set[[colname]])), "unique values\n")
   
-  cat("•", colname, "→", n_unique, "unique values\n")
+  # Create a frequency table
+  counts <- sort(table(data.set[[colname]]), decreasing = TRUE)
   
-  if (n_unique <= 15) {
-    print(vals)
+  # Display top 15 values for readability
+  if (length(counts) > 15) {
+    cat("  (showing top 15 values)\n")
+    print(head(counts, 15))
   } else {
-    cat("  (showing first 15)\n")
-    print(head(vals, 15))
+    print(counts)
   }
-  cat("\n--------------------------------------\n")
+  
+  cat("--------------------------------------\n")
 }

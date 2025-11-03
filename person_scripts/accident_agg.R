@@ -6,7 +6,8 @@ accident_agg <- accident %>%
     # --- Temporal features ---
     YEAR = year(ACCIDENT_DATE),
     MONTH = month(ACCIDENT_DATE),
-    DAY_OF_WEEK = wday(ACCIDENT_DATE),
+    IS_WEEKEND = DAY_WEEK_DESC %in% c("Saturday", "Sunday"),
+    
     HOUR = as.numeric(substr(ACCIDENT_TIME, 1, 2)),
     TIME_OF_DAY = case_when(
       HOUR >= 5 & HOUR < 12 ~ "Morning",
@@ -14,16 +15,17 @@ accident_agg <- accident %>%
       HOUR >= 17 & HOUR < 21 ~ "Evening",
       TRUE ~ "Night"
     ),
-    IS_WEEKEND = DAY_OF_WEEK %in% c("Sat", "Sun"),
     
     # --- Speed & road context ---
     SPEED_ZONE_NUM = as.numeric(SPEED_ZONE),
     SPEED_CAT = case_when(
-      SPEED_ZONE_NUM %in% 30:60 ~ "Low",
-      SPEED_ZONE_NUM %in% 70:90 ~ "Medium",
-      SPEED_ZONE_NUM >= 100 ~ "High",
+      SPEED_ZONE_NUM >= 30 & SPEED_ZONE_NUM <= 60 ~ "Low",
+      SPEED_ZONE_NUM >= 61 & SPEED_ZONE_NUM <= 90 ~ "Medium",
+      SPEED_ZONE_NUM >= 91 & SPEED_ZONE_NUM <= 200 ~ "High",
+      SPEED_ZONE_NUM > 200 ~ "Unknown",
       TRUE ~ "Unknown"
     ),
+    
     
     ROAD_TYPE_GRP = case_when(
       grepl("intersection", ROAD_GEOMETRY_DESC, ignore.case = TRUE) ~ "Intersection",
@@ -61,10 +63,9 @@ accident_agg <- accident %>%
   group_by(ACCIDENT_NO) %>%
   summarise(
     YEAR = first(YEAR),
-    IS_WEEKEND = as.integer(any(IS_WEEKEND)),
+    IS_WEEKEND = as.integer(any(IS_WEEKEND, na.rm = TRUE)),
     SPEED_ZONE_NUM = mean(SPEED_ZONE_NUM, na.rm = TRUE),
     MONTH = first(MONTH),
-    DAY_OF_WEEK = first(DAY_OF_WEEK),
     TIME_OF_DAY = first(TIME_OF_DAY),
     SPEED_CAT = first(SPEED_CAT),
     ROAD_TYPE_GRP = first(ROAD_TYPE_GRP),

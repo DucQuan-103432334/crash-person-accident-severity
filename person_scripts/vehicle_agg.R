@@ -8,7 +8,7 @@ vehicle_agg <- vehicle %>%
       FUEL_TYPE == "E" ~ "Electric",
       TRUE ~ "Unknown"
     ),
-    
+
     # --- Direction grouping ---
     DIR_INIT_N = INITIAL_DIRECTION %in% c("N","NE","NW"),
     DIR_INIT_E = INITIAL_DIRECTION %in% c("E","NE","SE"),
@@ -18,7 +18,7 @@ vehicle_agg <- vehicle %>%
     DIR_FINAL_E = FINAL_DIRECTION %in% c("E","NE","SE"),
     DIR_FINAL_S = FINAL_DIRECTION %in% c("S","SE","SW"),
     DIR_FINAL_W = FINAL_DIRECTION %in% c("W","NW","SW"),
-    
+
     # --- Compact driver intent grouping ---
     DRIVER_INTENT_GRP = case_when(
       DRIVER_INTENT %in% c("01","02","03") ~ "Straight_Turn",
@@ -27,7 +27,7 @@ vehicle_agg <- vehicle %>%
       DRIVER_INTENT %in% c("05","06","07","08","16","17","18","19") ~ "Maneuvering",
       TRUE ~ "Unknown"
     ),
-    
+
     # --- Compact vehicle movement grouping ---
     VEHICLE_MOVEMENT_GRP = case_when(
       VEHICLE_MOVEMENT %in% c("01","02","03") ~ "Straight_Turn",
@@ -36,7 +36,7 @@ vehicle_agg <- vehicle %>%
       VEHICLE_MOVEMENT %in% c("05","06","07","08","16","17","18","19") ~ "Maneuvering",
       TRUE ~ "Unknown"
     ),
-    
+
     # --- Compact traffic control grouping ---
     TRAFFIC_CONTROL_GRP = case_when(
       TRAFFIC_CONTROL_DESC %in% c("Stop-go lights", "Ped. lights", "Flashing lights") ~ "Signalized",
@@ -46,7 +46,7 @@ vehicle_agg <- vehicle %>%
       TRAFFIC_CONTROL_DESC %in% c("RX Gates/Booms", "Police", "Other") ~ "RailOrPolice",
       TRUE ~ "NoneOrUnknown"
     ),
-    
+
     # --- Binary flags ---
     LAMPS_OFF_FLAG = LAMPS == 2
   ) %>%
@@ -56,16 +56,16 @@ vehicle_agg <- vehicle %>%
     NO_OF_CYLINDERS_AVG = mean(NO_OF_CYLINDERS, na.rm = TRUE),
     TARE_WEIGHT_AVG = mean(TARE_WEIGHT, na.rm = TRUE),
     TOTAL_OCCUPANTS_AVG = mean(TOTAL_NO_OCCUPANTS, na.rm = TRUE),
-    
+
     FUEL_COMBUSTION_PCT = mean(FUEL_GROUP == "Combustion", na.rm = TRUE),
     FUEL_ELECTRIC_PCT   = mean(FUEL_GROUP == "Electric", na.rm = TRUE),
     FUEL_UNKNOWN_PCT    = mean(FUEL_GROUP == "Unknown", na.rm = TRUE),
-    
+
     DRIVER_ACTIVE_PCT   = mean(DRIVER_INTENT_GRP %in% c("Straight_Turn", "Maneuvering"), na.rm = TRUE),
     DRIVER_PASSIVE_PCT  = mean(DRIVER_INTENT_GRP %in% c("Parking_Reversing", "Stationary"), na.rm = TRUE),
     MOVE_ACTIVE_PCT     = mean(VEHICLE_MOVEMENT_GRP %in% c("Straight_Turn", "Maneuvering"), na.rm = TRUE),
     MOVE_PASSIVE_PCT    = mean(VEHICLE_MOVEMENT_GRP %in% c("Parking_Reversing", "Stationary"), na.rm = TRUE),
-    
+
     # --- Traffic control proportions ---
     TRAFFIC_SIGNALIZED_PCT   = mean(TRAFFIC_CONTROL_GRP == "Signalized", na.rm = TRUE),
     TRAFFIC_SIGNBASED_PCT    = mean(TRAFFIC_CONTROL_GRP == "SignBased", na.rm = TRUE),
@@ -73,10 +73,13 @@ vehicle_agg <- vehicle %>%
     TRAFFIC_PEDESTRIAN_PCT   = mean(TRAFFIC_CONTROL_GRP == "PedestrianControl", na.rm = TRUE),
     TRAFFIC_RAILPOLICE_PCT   = mean(TRAFFIC_CONTROL_GRP == "RailOrPolice", na.rm = TRUE),
     TRAFFIC_NONEUNKNOWN_PCT  = mean(TRAFFIC_CONTROL_GRP == "NoneOrUnknown", na.rm = TRUE),
-    
+
     ANY_LAMPS_OFF = as.integer(any(LAMPS_OFF_FLAG, na.rm = TRUE))
   ) %>%
   ungroup()
 
 cat("vehicle_agg ready with traffic control groups — Rows:", nrow(vehicle_agg),
     " Unique accidents:", length(unique(vehicle_agg$ACCIDENT_NO)), "\n")
+
+
+
